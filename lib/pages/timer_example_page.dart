@@ -5,12 +5,12 @@ import 'package:provider/provider.dart';
 import '../bloc/timer_bloc.dart';
 
 
-class StreamExamplePage extends StatefulWidget {
+class TimerExamplePage extends StatefulWidget {
   @override
-  _StreamExamplePageState createState() => _StreamExamplePageState();
+  _TimerExamplePageState createState() => _TimerExamplePageState();
 }
 
-class _StreamExamplePageState extends State<StreamExamplePage> {
+class _TimerExamplePageState extends State<TimerExamplePage> {
   static int timerDuration = 0;
   int val = 0;
 

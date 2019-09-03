@@ -7,6 +7,7 @@ import '../bloc/timer_bloc.dart';
 import 'thread_page.dart';
 import 'json_example_page.dart';
 import 'stream_example_page.dart';
+import 'timer_example_page.dart';
 
 
 class HomePage extends StatefulWidget {
@@ -120,6 +121,17 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: Text("json页面"),
+            ),
+          ),
+          SizedBox(height: 20.0,),
+          Center(
+            child: RaisedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => new TimerExamplePage()),
+                );
+              },
+              child: Text("timer页面"),
             ),
           ),
           SizedBox(height: 20.0,),
