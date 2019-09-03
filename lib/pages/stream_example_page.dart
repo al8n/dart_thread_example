@@ -17,36 +17,6 @@ class StreamExamplePage extends StatefulWidget {
 }
 
 class _StreamExamplePageState extends State<StreamExamplePage> {
-  static int timerDuration = 0;
-  int val = 0;
-
-  static isolateEntry(Map<String, dynamic> data) async {
-    print('${data["url"]} ${data["path"]}');
-    Timer.periodic(Duration(seconds: 1,), (Timer t) {
-      timerDuration++;
-      data["sendPort"].send(timerDuration);
-    });
-  }
-
-  Future loadIsolate() async {
-    ReceivePort receivePort = ReceivePort();
-
-    Isolate isolate = await Isolate.spawn(isolateEntry, <String, dynamic>{"sendPort": receivePort.sendPort, "path": 'path', "url": 'url'});
-
-    receivePort.listen((data){
-      print(data);
-      setState(() {
-        val = data;
-      });
-      if( data > 30) {
-        receivePort.close();
-        isolate.kill(priority: Isolate.immediate);
-      }
-    }, onDone: () {
-      print('done');
-    });
-
-  }
 
   static imageIsolateEntry(Map<String, dynamic> data) async {
     Dio dio = Dio();
@@ -107,7 +77,6 @@ class _StreamExamplePageState extends State<StreamExamplePage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // loadIsolate();
   }
 
   @override
@@ -122,16 +91,12 @@ class _StreamExamplePageState extends State<StreamExamplePage> {
         children: <Widget>[
           Container(
             child: Center(
-              child: Text('$val'),
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Center(
-            child: RaisedButton(
-              onPressed: (){
-                downloadImage(imageDownloadBloc, url);
-              },
-              child: Text("开始表演"),
+              child: RaisedButton(
+                onPressed: (){
+                  downloadImage(imageDownloadBloc, url);
+                },
+                child: Text("开始表演"),
+              ),
             ),
           )
         ],
