@@ -14,18 +14,17 @@ class _TimerExamplePageState extends State<TimerExamplePage> {
   static int timerDuration = 0;
   int val = 0;
 
-  static isolateEntry(Map<String, dynamic> data) async {
-    print('${data["url"]} ${data["path"]}');
+  static isolateEntry(SendPort sendPort) async {
     Timer.periodic(Duration(seconds: 1,), (Timer t) {
       timerDuration++;
-      data["sendPort"].send(timerDuration);
+      sendPort.send(timerDuration);
     });
   }
 
   Future timerIsolate(TimerBloc timerBloc, int duration) async {
     ReceivePort receivePort = ReceivePort();
 
-    Isolate isolate = await Isolate.spawn(isolateEntry, <String, dynamic>{"sendPort": receivePort.sendPort, "path": 'path', "url": 'url'});
+    Isolate isolate = await Isolate.spawn(isolateEntry, receivePort.sendPort);
 
     receivePort.listen((data){
       timerBloc.duration = data;
@@ -49,6 +48,8 @@ class _TimerExamplePageState extends State<TimerExamplePage> {
         title: Text("stream页面"),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Container(
             child: Center(

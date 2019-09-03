@@ -88,6 +88,8 @@ class _StreamExamplePageState extends State<StreamExamplePage> {
         title: Text("stream页面"),
       ),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.max,
         children: <Widget>[
           Container(
             child: Center(
