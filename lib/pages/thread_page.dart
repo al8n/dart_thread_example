@@ -10,8 +10,6 @@ import 'package:path/path.dart' as path;
 import 'package:image_picker_saver/image_picker_saver.dart';
 import '../bloc/image_download_bloc.dart';
 import '../bloc/prime_bloc.dart';
-import '../bloc/timer_bloc.dart';
-
 
 
 class ThreadPage extends StatefulWidget {
@@ -23,12 +21,6 @@ class _ThreadPageState extends State<ThreadPage> {
   Isolate primeIsolate;
   SendPort primeSendPort;
   ReceivePort primeReceivePort;
-
-  static int timerDuration = 0;
-  Isolate timerIsolate;
-  SendPort timerSendPort;
-  ReceivePort timerReceivePort;
-  bool timerRunning;
 
   Isolate imageIsolate;
   SendPort imageSendPort;
@@ -94,34 +86,6 @@ class _ThreadPageState extends State<ThreadPage> {
     primeIsolate.kill(priority: Isolate.immediate);
   }
 
-  /// 时间进程
-  /// 我们会在线程中开启一个计时器
-  void _startTimer(TimerBloc timerBloc, int duration) async {
-    timerRunning = true;
-    timerReceivePort = ReceivePort();
-    timerIsolate = await Isolate.spawn(_updateTimer, timerReceivePort.sendPort);
-    timerReceivePort.listen((dynamic data) {
-      int val = int.parse(data);
-      timerBloc.duration = val;
-      print('Received: ' + data);
-
-      if(val >= duration) {
-        timerReceivePort.close();
-        timerIsolate.kill(priority:  Isolate.immediate);
-      }
-    }, onDone: () {
-      print('结束');
-    });
-  }
-
-  static void _updateTimer(SendPort sendPort) {
-    Timer.periodic(Duration(seconds: 1,), (Timer t) {
-      timerDuration++;
-      String msg = timerDuration.toString();
-      print('Send: ' + msg);
-      sendPort.send(msg);
-    });
-  }
 
   /// 使用第一种方法实现并发下载图片
   static void downloadImage(SendPort sendPort) async {
@@ -204,7 +168,6 @@ class _ThreadPageState extends State<ThreadPage> {
   Widget build(BuildContext context) {
     ImageDownloadBloc imageDownloadBloc = Provider.of<ImageDownloadBloc>(context);
     PrimeBloc primeBloc = Provider.of<PrimeBloc>(context);
-    TimerBloc timerBloc = Provider.of<TimerBloc>(context);
     String url = "https://pixabay.com/get/55e8d541495bad14f6da8c7dda79367d1138d7e457586c4870297cd09f4dc658b9_1280.jpg";
     return Scaffold(
       appBar: AppBar(
@@ -219,7 +182,6 @@ class _ThreadPageState extends State<ThreadPage> {
             child: RaisedButton(
               onPressed: () {
                 _getPrime(primeBloc, 5000);
-
               },
               child: Text("开启质数线程"),
             ),
@@ -231,15 +193,6 @@ class _ThreadPageState extends State<ThreadPage> {
                 _downloadImage(imageDownloadBloc, url);
               },
               child: Text("开启图片下载线程"),
-            ),
-          ),
-          SizedBox(height: 10.0,),
-          Center(
-            child: RaisedButton(
-              onPressed: () {
-                _startTimer(timerBloc, 20);
-              },
-              child: Text("开启时间线程"),
             ),
           ),
           SizedBox(height: 10.0,),
